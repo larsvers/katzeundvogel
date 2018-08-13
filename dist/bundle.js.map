@@ -1,0 +1,1 @@
+{"version":3,"file":"bundle.js","sources":["../src/app.js"],"sourcesContent":["\nconsole.log('Wello Horld');"],"names":["console","log"],"mappings":";;;CACAA,QAAQC,GAAR,CAAY,aAAZ;;;;"}

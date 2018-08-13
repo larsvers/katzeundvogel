@@ -1,0 +1,31 @@
+{
+  "name": "Hello",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Lars Verspohl",
+  "license": "ISC",
+  "main": "src/app.js",
+  "devDependencies": {
+    "babel-core": "^6",
+    "babel-plugin-external-helpers": "^6",
+    "babel-preset-env": "^1",
+    "npm-run-all": "^4",
+    "rollup": "^0",
+    "rollup-plugin-babel": "^3",
+    "rollup-plugin-commonjs": "^9",
+    "rollup-plugin-node-resolve": "^3",
+    "rollup-plugin-uglify": "^4",
+    "uglify-js": "^3"
+  },
+  "dependencies": {
+    "d3": "^5",
+    "d3-geo-projection": "^1",
+    "d3-scale-chromatic": "^1",
+    "topojson": "^3"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "ugly": "uglifyjs dist/bundle.js -c -m -o dist/bundle.min.js"
+  }
+}
