@@ -2,16 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>main</title>
+  <title>Katse && Phogl</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style type="text/css">
 
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #container {
+      position: relative;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    #cat-image {
+      display: none;
+    }
   </style> 
+
 </head>
 <body>
 
-  <div id="container"></div>
+  <img src="./images/cat.png" id="cat-image">
+
+  <div id="container">
+  <audio id="music" controls loop autoplay muted>
+    <source src="music/einmusik.mp3" type="audio/mpeg">
+      Oh no!! The audio API is not supported. Just look at the birds instead...
+  </audio>
+    <canvas id="flock"></canvas>
+    <canvas id="cat"></canvas>
+    <canvas id="eyes"></canvas>
+  </div>
 
   <script src="dist/bundle.js"></script>
 

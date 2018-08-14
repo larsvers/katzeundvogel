@@ -1,7 +1,7 @@
 {
-  "name": "Hello",
+  "name": "KatzeUndVogel",
   "version": "0.1.0",
-  "description": "",
+  "description": "web site for katzeundvogel.club",
   "author": "Lars Verspohl",
   "license": "ISC",
   "main": "src/app.js",
@@ -21,6 +21,7 @@
     "d3": "^5",
     "d3-geo-projection": "^1",
     "d3-scale-chromatic": "^1",
+    "debounce": "^1",
     "topojson": "^3"
   },
   "scripts": {
