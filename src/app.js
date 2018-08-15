@@ -21,6 +21,7 @@ import {
 } from './utils.js';
 import { beatDetect } from './beatDetect.js';
 import { drawEyes } from './drawEyes.js';
+import { drawEye } from './drawEye.js';
 
 function ready(w, h) {
   /* The sound */
@@ -81,6 +82,9 @@ function ready(w, h) {
   let timerBirds;
   let flock = [];
   let lines = [];
+  const flockBounds = { x: w * 0.26, y: w * 0.34 };
+  const aspect = w / h;
+  const mobile = false;
 
   // Boids.
   function Boid(x, y, z) {
@@ -89,6 +93,7 @@ function ready(w, h) {
       powerLine: -1,
       v: { x: 0, y: 0, z: 0 }
     };
+
     let lastStep = 0;
     function stepSitting() {
       let i, b;
@@ -266,11 +271,13 @@ function ready(w, h) {
       boid.v.z = LAUNCH_VELOCITY * direction.z;
       return 0;
     }
+
     boid.step = function() {
       let pl = boid.powerLine;
       if (boid.powerLine >= 0) stepSitting();
       else stepFlying();
     };
+
     return boid;
   }
 
@@ -301,8 +308,8 @@ function ready(w, h) {
 
   function getFlockCentre(currentFlock, canvasDims) {
     const flockCentre = currentFlock.map(b => ({
-      x: (b.p.x * 225) / b.p.z + 300,
-      y: (b.p.y * 225) / b.p.z + 300
+      x: (b.p.x * flockBounds.x) / b.p.z + flockBounds.y,
+      y: (b.p.y * flockBounds.x) / b.p.z + flockBounds.y
     }));
 
     const xCentre = mean(flockCentre, d => d.x);
@@ -333,13 +340,13 @@ function ready(w, h) {
       fog(ctx, b.p.z);
       circle(
         ctx,
-        (225 * b.p.x) / b.p.z + 300,
-        (225 * b.p.y) / b.p.z + 225,
-        62.5 / b.p.z
+        (flockBounds.x * b.p.x) / b.p.z + flockBounds.y,
+        (flockBounds.x * b.p.y) / b.p.z + flockBounds.x,
+        mobile ? 30 / b.p.z : 60 / b.p.z
       );
     });
     each(lines, function(l) {
-      let v = parseInt((225 * l.y) / l.z + 225);
+      let v = parseInt((flockBounds.x * l.y) / l.z + flockBounds.x);
       line(ctx, 0, v, ctx.canvas.width, v);
     });
   }
@@ -375,24 +382,6 @@ function ready(w, h) {
 
   initBirds();
 
-  /* Move birds on beat */
-  /* ------------------ */
-
-  // Update flock movement
-  function changeFlockMovement() {
-    COLLISION_DISTANCE = COLLISION_DISTANCE === 1.0 ? 2.0 : 1.0;
-    MAXIMUM_VELOCITY = MAXIMUM_VELOCITY === 1 ? 1.5 : 1;
-  }
-
-  // Flock movement changes on beat and on open beat gate.
-  let beatGate = true;
-  let beatTimer = interval(() => (beatGate = true), 1000);
-
-  // Beat handler.
-  dispatcher.on('beat', e => {
-    if (beatGate) changeFlockMovement();
-    beatGate = false;
-  });
 
   /* Draw the cat */
   /* ------------ */
@@ -403,29 +392,119 @@ function ready(w, h) {
   const ctxCat = canCat.getContext('2d');
 
   const cat = document.getElementById('cat-image');
-  const catDims = {
-    x: 0,
-    y: h - cat.height,
-    width: cat.width,
-    height: cat.height
-  };
-  ctxCat.drawImage(cat, catDims.x, catDims.y);
-  const canDims = { width: canCat.width, height: canCat.height }
+
+  // Cat half the size for mobile.
+  const catDims = mobile
+    ? {
+        x: 0,
+        y: h - cat.height / 2,
+        width: cat.width / 2,
+        height: cat.height / 2
+      }
+    : {
+        x: 0,
+        y: h - cat.height,
+        width: cat.width,
+        height: cat.height
+      };
+
+  ctxCat.drawImage(cat, catDims.x, catDims.y, catDims.width, catDims.height);
+
+  const canDims = { width: canCat.width, height: canCat.height };
 
   // The eyes
   const canEyes = select('#eyes').node();
   (canEyes.width = w), (canEyes.height = h);
   const ctxEyes = canEyes.getContext('2d');
 
+  // Set the eye dimensions.
+  const leftEye = {
+    // x: catDims.width * 0.32,
+    x: catDims.width * 0.34,
+    y: catDims.y + catDims.height * 0.71,
+    r: catDims.width * 0.055
+  };
+  const rightEye = {
+    // x: catDims.width * 0.72,
+    x: catDims.width * 0.74,
+    y: catDims.y + catDims.height * 0.6985,
+    r: catDims.width * 0.055
+  };
+
   // Calculate and draw.
   function moveEyes() {
+    // Get flock position.
     const flockPosition = getFlockCentre(flock, canDims);
-    drawEyes(ctxEyes, catDims, flockPosition);
+
+    // Draw.
+    ctxEyes.clearRect(0, 0, ctxEyes.canvas.width, ctxEyes.canvas.height);
+    drawEye(ctxEyes, leftEye, flockPosition);
+    drawEye(ctxEyes, rightEye, flockPosition);
   }
 
-  const timerEyes = interval(moveEyes, 50)
+  // Run the eyes.
+  const timerEyes = interval(moveEyes, 50);
+
+  /* Prep the cat blink */
+  /* ------------------ */
+
+  // The lids.
+  const canLids = select('#lids').node();
+  (canLids.width = w), (canLids.height = h);
+  const ctxLids = canLids.getContext('2d');
+
+  function drawLids(height) {
+    ctxLids.clearRect(0, 0, canLids.width, canLids.height)
+    ctxLids.fillRect(
+      catDims.width * 0.24,
+      catDims.y + catDims.height / 2,
+      catDims.width * 0.6,
+      height
+    );    
+  }
+
+  function moveLids() {
+    let count = 0;
+    let countup = true;
+
+    function timerLids() {
+      if (countup) {
+        count += 8;
+        if (count >= 30) countup = false;
+      } else {
+        count -= 8;
+        if (count <= 0) intervalLids.stop()
+      }
+      drawLids(count);
+    }
+
+    const intervalLids = interval(timerLids, 10);
+  }
 
 
+  /* Move birds and cat's lids on beat */
+  /* --------------------------------- */
+
+  // Flock movement changes on beat and on open beat gate.
+  let beatGate = true;
+  let beatTimer = interval(() => (beatGate = true), 1000);
+
+
+  // Update flock movement
+  function changeFlockMovement() {
+    COLLISION_DISTANCE = COLLISION_DISTANCE === 1.0 ? 2.0 : 1.0;
+    MAXIMUM_VELOCITY = MAXIMUM_VELOCITY === 1 ? 1.5 : 1;
+  }
+
+  // Beat handler.
+  dispatcher.on('beat', e => {    
+    if (beatGate) {
+      console.log(beatGate); 
+      changeFlockMovement();
+      moveLids();
+    }
+    beatGate = false;
+  });
 }
 
 function resize() {
