@@ -1,6 +1,7 @@
 import { select } from 'd3-selection';
+import { transition } from 'd3-transition';
 import { dispatch } from 'd3-dispatch';
-import { mean } from 'd3-array';
+import { max, mean } from 'd3-array';
 import { interval, timer } from 'd3-timer';
 import debounce from 'debounce';
 import {
@@ -20,7 +21,6 @@ import {
   line
 } from './utils.js';
 import { beatDetect } from './beatDetect.js';
-import { drawEyes } from './drawEyes.js';
 import { drawEye } from './drawEye.js';
 
 function ready(w, h) {
@@ -83,8 +83,7 @@ function ready(w, h) {
   let flock = [];
   let lines = [];
   const flockBounds = { x: w * 0.26, y: w * 0.34 };
-  const aspect = w / h;
-  const mobile = false;
+  const mobile = window.innerWidth < 650 ? true : false;
 
   // Boids.
   function Boid(x, y, z) {
@@ -382,7 +381,6 @@ function ready(w, h) {
 
   initBirds();
 
-
   /* Draw the cat */
   /* ------------ */
 
@@ -454,13 +452,13 @@ function ready(w, h) {
   const ctxLids = canLids.getContext('2d');
 
   function drawLids(height) {
-    ctxLids.clearRect(0, 0, canLids.width, canLids.height)
+    ctxLids.clearRect(0, 0, canLids.width, canLids.height);
     ctxLids.fillRect(
       catDims.width * 0.24,
       catDims.y + catDims.height / 2,
       catDims.width * 0.6,
       height
-    );    
+    );
   }
 
   function moveLids() {
@@ -473,14 +471,13 @@ function ready(w, h) {
         if (count >= 30) countup = false;
       } else {
         count -= 8;
-        if (count <= 0) intervalLids.stop()
+        if (count <= 0) intervalLids.stop();
       }
       drawLids(count);
     }
 
     const intervalLids = interval(timerLids, 10);
   }
-
 
   /* Move birds and cat's lids on beat */
   /* --------------------------------- */
@@ -489,7 +486,6 @@ function ready(w, h) {
   let beatGate = true;
   let beatTimer = interval(() => (beatGate = true), 1000);
 
-
   // Update flock movement
   function changeFlockMovement() {
     COLLISION_DISTANCE = COLLISION_DISTANCE === 1.0 ? 2.0 : 1.0;
@@ -497,14 +493,48 @@ function ready(w, h) {
   }
 
   // Beat handler.
-  dispatcher.on('beat', e => {    
+  dispatcher.on('beat', e => {
     if (beatGate) {
-      console.log(beatGate); 
       changeFlockMovement();
       moveLids();
     }
     beatGate = false;
   });
+
+  /* Move elements into position */
+  /* --------------------------- */
+
+  // POsition mute|ummute button and handler
+  select('#mute')
+    .style('width', `${catDims.width}px`)
+    .style('height', `${catDims.height}px`)
+    .on('mousedown', () => {
+      // Mute|unmute.
+      const a = select('audio').node();
+      a.muted = !a.muted;
+      // Show|hide text.
+      select('#mute-text')
+        .transition()
+        .style('opacity', a.muted ? 1 : 0);
+    });
+
+  // Add Mute|unmute text
+  select('#mute-text').style('left', `${catDims.width * 1.1}px`);
+
+  // Position mail text.
+  // Get y position of lowest line
+  const yMaxLine = max(lines, d => d.y);
+  const yMaxIndex = lines.findIndex(d => d.y === yMaxLine);
+  const yLowestLine = parseInt(
+    (flockBounds.x * lines[yMaxIndex].y) / lines[yMaxIndex].z + flockBounds.x
+  );
+
+  // Position text.
+  select('#mail')
+    .style('top', `${yLowestLine + 10}px`)
+    .transition()
+    .delay(250)
+    .style('opacity', 1);
 }
 
 function resize() {

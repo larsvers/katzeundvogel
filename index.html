@@ -4,16 +4,28 @@
   <meta charset="utf-8">
   <title>Katse && Phogl</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Homemade+Apple" rel="stylesheet">
+  <!-- <link href="https://fonts.googleapis.com/css?family=Allura|Butterfly+Kids|Euphoria+Script|League+Script|Parisienne|Petit+Formal+Script" rel="stylesheet"> -->
+
+  <!-- Remove for production. -->
+  <script src="//unpkg.com/d3"></script>
 
   <style type="text/css">
 
     body {
       margin: 0;
       padding: 0;
+      font-family: 'Homemade Apple', cursive;
+      /* font-family: 'Parisienne', cursive; */
+      /* font-family: 'Allura', cursive; */
+      /* font-family: 'Petit Formal Script', cursive; */
+      /* font-family: 'Euphoria Script', cursive; */
+      /* font-family: 'League Script', cursive; */
+      /* font-family: 'Butterfly Kids', cursive; */
     }
-
     #container {
       position: relative;
+      height: 100vh;
     }
     canvas {
       position: absolute;
@@ -25,6 +37,35 @@
     #cat-image {
       display: none;
     }
+    button#mute {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      opacity: 0;
+    }
+    #mute-text {
+      position: absolute;
+      bottom: 0;
+    }
+    #mail {
+      position: absolute;
+      right: 0;
+      opacity: 0;
+    }
+    #mail a:link,
+    #mail a:visited,
+    #mail a:active {
+      color: #000;
+      text-decoration: none;
+      padding: 0.2em 0;
+      margin-right: 1em;
+      transition: color 1s ease;
+    }
+
+    #mail a:hover {
+      color: hotpink;
+    }
+
   </style> 
 
 </head>
@@ -33,15 +74,19 @@
   <img src="./images/cat.png" id="cat-image">
 
   <div id="container">
-  <audio id="music" controls loop autoplay>
-    <source src="music/einmusik.mp3" type="audio/mpeg">
-      Oh no!! The audio API is not supported. Just look at the birds instead...
-  </audio>
+    <audio id="music" loop autoplay muted>
+      <source src="music/einmusik.mp3" type="audio/mpeg">
+        Oh no!! The audio API is not supported. Just look at the birds instead...
+    </audio>
     <canvas id="flock"></canvas>
     <canvas id="cat"></canvas>
     <canvas id="eyes"></canvas>
     <canvas id="lids"></canvas>
+    <button id="mute"></button>
+    <div id="mute-text">← Hit Katze to hear...</div>
+    <div id="mail"><a href="mailto:piep@katzeundvogel.club?Subject=Miau" target="_top">piep@katzeundvogel.club</a></div>
   </div>
+
 
   <script src="dist/bundle.js"></script>
 
