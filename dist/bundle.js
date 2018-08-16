@@ -2998,14 +2998,13 @@
     var mobile = window.innerWidth < 650 ? true : false;
 
     // Colours.
-    var colourFlock = [240, 248, 255]; // rgb string.
-    var colourCat = [9, 14, 34]; // rgb string.
-    var colourCanvasStop0 = '#0E1736';
-    var colourCanvasStop1 = '#1e3173';
-    var colourPowerLines = 'aliceblue';
+    var colourFlock = [0, 0, 0];
+    var colourCat = [0, 0, 0];
+    var colourCanvasStop0 = 'white';
+    var colourCanvasStop1 = 'white';
+    var colourPowerLines = 'black';
     var colourPupilOuter = 'black';
-    var colourPupilInner = 'white';
-    var colourLids = '#090e22';
+    var colourLids = '#black';
 
     // Boids.
     function Boid(x, y, z) {
@@ -3320,10 +3319,8 @@
 
       // Draw.
       ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
-      drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
-      drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
-      drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
-      drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
+      drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
     }
 
     // Run the pupils.

@@ -87,14 +87,14 @@ function ready(w, h) {
   const mobile = window.innerWidth < 650 ? true : false;
 
   // Colours.
-  const colourFlock = [240, 248, 255]; // rgb string.
-  const colourCat = [9,14,34]; // rgb string.
-  const colourCanvasStop0 = '#0E1736';
-  const colourCanvasStop1 = '#1e3173';
-  const colourPowerLines = 'aliceblue';
+  const colourFlock = [0, 0, 0];
+  const colourCat = [0, 0, 0];
+  const colourCanvasStop0 = 'white';
+  const colourCanvasStop1 = 'white';
+  const colourPowerLines = 'black';
   const colourPupilOuter = 'black';
-  const colourPupilInner = 'white';
-  const colourLids = '#090e22';
+  const colourPupilInner = 'black';
+  const colourLids = '#black';
 
 
   // Boids.
@@ -458,10 +458,8 @@ function ready(w, h) {
 
     // Draw.
     ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
-    drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
-    drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
-    drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
-    drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
+    drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
+    drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
   }
 
   // Run the pupils.
