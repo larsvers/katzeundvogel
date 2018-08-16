@@ -21,7 +21,8 @@ import {
   line
 } from './utils.js';
 import { beatDetect } from './beatDetect.js';
-import { drawEye } from './drawEye.js';
+import { drawPupil } from './drawPupil.js';
+import colourImage from './colourImage.js';
 
 function ready(w, h) {
   /* The sound */
@@ -84,6 +85,17 @@ function ready(w, h) {
   let lines = [];
   const flockBounds = { x: w * 0.26, y: w * 0.34 };
   const mobile = window.innerWidth < 650 ? true : false;
+
+  // Colours.
+  const colourFlock = [240, 248, 255]; // rgb string.
+  const colourCat = [9,14,34]; // rgb string.
+  const colourCanvasStop0 = '#0E1736';
+  const colourCanvasStop1 = '#1e3173';
+  const colourPowerLines = 'aliceblue';
+  const colourPupilOuter = 'black';
+  const colourPupilInner = 'white';
+  const colourLids = '#090e22';
+
 
   // Boids.
   function Boid(x, y, z) {
@@ -301,8 +313,11 @@ function ready(w, h) {
   }
 
   function fog(ctx, z) {
+    // let c = Math.max(0, parseInt(-50 + 284 * (z / PYRAMID_TOP)));
     let c = Math.max(0, parseInt(-50 + 284 * (z / PYRAMID_TOP)));
-    ctx.fillStyle = 'rgb(' + c + ',' + c + ',' + c + ')';
+    // debounce(console.log(c), 200);
+    ctx.fillStyle = `rgba(${colourFlock.join()}, ${c})`;
+    // ctx.fillStyle = 'tomato';
   }
 
   function getFlockCentre(currentFlock, canvasDims) {
@@ -328,9 +343,15 @@ function ready(w, h) {
   function draw() {
     let ctx = ctxFlock;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = '#000';
-    ctx.strokeStyle = '#000';
+    const grd = ctx.createLinearGradient(0, 0, 0, h);
+    grd.addColorStop(0, colourCanvasStop0)
+    grd.addColorStop(1, colourCanvasStop1)
+    ctx.fillStyle = grd;
+    ctx.strokeStyle = colourPowerLines;
     ctx.lineWidth = 0.5;
+
+    // Background colour;
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.width)
 
     flock.sort(function(a, b) {
       return b.p.z - a.p.z;
@@ -407,22 +428,23 @@ function ready(w, h) {
       };
 
   ctxCat.drawImage(cat, catDims.x, catDims.y, catDims.width, catDims.height);
+  colourImage(ctxCat, colourCat);
 
   const canDims = { width: canCat.width, height: canCat.height };
 
-  // The eyes
-  const canEyes = select('#eyes').node();
-  (canEyes.width = w), (canEyes.height = h);
-  const ctxEyes = canEyes.getContext('2d');
+  // The pupils
+  const canPupils = select('#pupils').node();
+  (canPupils.width = w), (canPupils.height = h);
+  const ctxPupils = canPupils.getContext('2d');
 
-  // Set the eye dimensions.
-  const leftEye = {
+  // Set the pupil dimensions.
+  const leftPupil = {
     // x: catDims.width * 0.32,
     x: catDims.width * 0.34,
     y: catDims.y + catDims.height * 0.71,
     r: catDims.width * 0.055
   };
-  const rightEye = {
+  const rightPupil = {
     // x: catDims.width * 0.72,
     x: catDims.width * 0.74,
     y: catDims.y + catDims.height * 0.6985,
@@ -430,18 +452,20 @@ function ready(w, h) {
   };
 
   // Calculate and draw.
-  function moveEyes() {
+  function movePupils() {
     // Get flock position.
     const flockPosition = getFlockCentre(flock, canDims);
 
     // Draw.
-    ctxEyes.clearRect(0, 0, ctxEyes.canvas.width, ctxEyes.canvas.height);
-    drawEye(ctxEyes, leftEye, flockPosition);
-    drawEye(ctxEyes, rightEye, flockPosition);
+    ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
+    drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
+    drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
+    drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
+    drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
   }
 
-  // Run the eyes.
-  const timerEyes = interval(moveEyes, 50);
+  // Run the pupils.
+  const timerPupils = interval(movePupils, 50);
 
   /* Prep the cat blink */
   /* ------------------ */
@@ -451,8 +475,15 @@ function ready(w, h) {
   (canLids.width = w), (canLids.height = h);
   const ctxLids = canLids.getContext('2d');
 
+  // ctxLids.save();
+  // ctxLids.fillStyle = 'coral';
+  // ctxLids.fillRect(0, 0, w, h);
+  // ctxLids.restore()
+
+
   function drawLids(height) {
     ctxLids.clearRect(0, 0, canLids.width, canLids.height);
+    ctxLids.fillStyle = colourLids;
     ctxLids.fillRect(
       catDims.width * 0.24,
       catDims.y + catDims.height / 2,
@@ -489,7 +520,7 @@ function ready(w, h) {
   // Update flock movement
   function changeFlockMovement() {
     COLLISION_DISTANCE = COLLISION_DISTANCE === 1.0 ? 2.0 : 1.0;
-    MAXIMUM_VELOCITY = MAXIMUM_VELOCITY === 1 ? 1.5 : 1;
+    MAXIMUM_VELOCITY = MAXIMUM_VELOCITY === 1 ? 1.2 : 1;
   }
 
   // Beat handler.

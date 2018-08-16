@@ -2867,20 +2867,77 @@
     return p;
   }
 
-  function drawEye(context, centre, focus) {
+  function drawPupil(context, centre, focus) {
+    var radius = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 2;
+    var colour = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '#000';
+
     // Get the point projected onto the eye.
     var eyePosition = projectOnCircle(focus, centre, centre.r);
 
     context.beginPath();
-    context.arc(eyePosition.x, eyePosition.y, 2, 0, 2 * Math.PI);
-    // context.fillStyle = 'tomato';
+    context.arc(eyePosition.x, eyePosition.y, radius, 0, 2 * Math.PI);
+    context.fillStyle = colour;
     context.fill();
+  }
 
-    // context.beginPath();
-    // context.moveTo(eyePosition.x - 2, eyePosition.y-4);
-    // context.lineTo(eyePosition.x + 2, eyePosition.y+4);
-    // context.closePath()
-    // context.stroke()
+  var slicedToArray = function () {
+    function sliceIterator(arr, i) {
+      var _arr = [];
+      var _n = true;
+      var _d = false;
+      var _e = undefined;
+
+      try {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+          _arr.push(_s.value);
+
+          if (i && _arr.length === i) break;
+        }
+      } catch (err) {
+        _d = true;
+        _e = err;
+      } finally {
+        try {
+          if (!_n && _i["return"]) _i["return"]();
+        } finally {
+          if (_d) throw _e;
+        }
+      }
+
+      return _arr;
+    }
+
+    return function (arr, i) {
+      if (Array.isArray(arr)) {
+        return arr;
+      } else if (Symbol.iterator in Object(arr)) {
+        return sliceIterator(arr, i);
+      } else {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance");
+      }
+    };
+  }();
+
+  /**
+   * Changes all coloured pixels of a 
+   * given context in the given colour.
+   * @param  {Object} context   Context.
+   * @param  {Array}  rgb       Array of r, g, b numbers.
+   * @return {undefined}        Updated canvas colours.
+   */
+  function colourImage(context, rgb) {
+    var _rgb = slicedToArray(rgb, 3),
+        r = _rgb[0],
+        g = _rgb[1],
+        b = _rgb[2];
+
+    var imgData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    for (var i = 0; i < imgData.data.length; i += 4) {
+      imgData.data[i] = r | imgData.data[i];
+      imgData.data[i + 1] = g | imgData.data[i + 1];
+      imgData.data[i + 2] = b | imgData.data[i + 2];
+    }
+    context.putImageData(imgData, 0, 0);
   }
 
   function ready(w, h) {
@@ -2939,6 +2996,16 @@
     var lines = [];
     var flockBounds = { x: w * 0.26, y: w * 0.34 };
     var mobile = window.innerWidth < 650 ? true : false;
+
+    // Colours.
+    var colourFlock = [240, 248, 255]; // rgb string.
+    var colourCat = [9, 14, 34]; // rgb string.
+    var colourCanvasStop0 = '#0E1736';
+    var colourCanvasStop1 = '#1e3173';
+    var colourPowerLines = 'aliceblue';
+    var colourPupilOuter = 'black';
+    var colourPupilInner = 'white';
+    var colourLids = '#090e22';
 
     // Boids.
     function Boid(x, y, z) {
@@ -3121,8 +3188,11 @@
     }
 
     function fog(ctx, z) {
+      // let c = Math.max(0, parseInt(-50 + 284 * (z / PYRAMID_TOP)));
       var c = Math.max(0, parseInt(-50 + 284 * (z / PYRAMID_TOP)));
-      ctx.fillStyle = 'rgb(' + c + ',' + c + ',' + c + ')';
+      // debounce(console.log(c), 200);
+      ctx.fillStyle = 'rgba(' + colourFlock.join() + ', ' + c + ')';
+      // ctx.fillStyle = 'tomato';
     }
 
     function getFlockCentre(currentFlock, canvasDims) {
@@ -3154,9 +3224,15 @@
     function draw() {
       var ctx = ctxFlock;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.fillStyle = '#000';
-      ctx.strokeStyle = '#000';
+      var grd = ctx.createLinearGradient(0, 0, 0, h);
+      grd.addColorStop(0, colourCanvasStop0);
+      grd.addColorStop(1, colourCanvasStop1);
+      ctx.fillStyle = grd;
+      ctx.strokeStyle = colourPowerLines;
       ctx.lineWidth = 0.5;
+
+      // Background colour;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.width);
 
       flock.sort(function (a, b) {
         return b.p.z - a.p.z;
@@ -3214,22 +3290,23 @@
     };
 
     ctxCat.drawImage(cat, catDims.x, catDims.y, catDims.width, catDims.height);
+    colourImage(ctxCat, colourCat);
 
     var canDims = { width: canCat.width, height: canCat.height };
 
-    // The eyes
-    var canEyes = select('#eyes').node();
-    canEyes.width = w, canEyes.height = h;
-    var ctxEyes = canEyes.getContext('2d');
+    // The pupils
+    var canPupils = select('#pupils').node();
+    canPupils.width = w, canPupils.height = h;
+    var ctxPupils = canPupils.getContext('2d');
 
-    // Set the eye dimensions.
-    var leftEye = {
+    // Set the pupil dimensions.
+    var leftPupil = {
       // x: catDims.width * 0.32,
       x: catDims.width * 0.34,
       y: catDims.y + catDims.height * 0.71,
       r: catDims.width * 0.055
     };
-    var rightEye = {
+    var rightPupil = {
       // x: catDims.width * 0.72,
       x: catDims.width * 0.74,
       y: catDims.y + catDims.height * 0.6985,
@@ -3237,18 +3314,20 @@
     };
 
     // Calculate and draw.
-    function moveEyes() {
+    function movePupils() {
       // Get flock position.
       var flockPosition = getFlockCentre(flock, canDims);
 
       // Draw.
-      ctxEyes.clearRect(0, 0, ctxEyes.canvas.width, ctxEyes.canvas.height);
-      drawEye(ctxEyes, leftEye, flockPosition);
-      drawEye(ctxEyes, rightEye, flockPosition);
+      ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
+      drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
+      drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
     }
 
-    // Run the eyes.
-    var timerEyes = interval$1(moveEyes, 50);
+    // Run the pupils.
+    var timerPupils = interval$1(movePupils, 50);
 
     /* Prep the cat blink */
     /* ------------------ */
@@ -3258,8 +3337,15 @@
     canLids.width = w, canLids.height = h;
     var ctxLids = canLids.getContext('2d');
 
+    // ctxLids.save();
+    // ctxLids.fillStyle = 'coral';
+    // ctxLids.fillRect(0, 0, w, h);
+    // ctxLids.restore()
+
+
     function drawLids(height) {
       ctxLids.clearRect(0, 0, canLids.width, canLids.height);
+      ctxLids.fillStyle = colourLids;
       ctxLids.fillRect(catDims.width * 0.24, catDims.y + catDims.height / 2, catDims.width * 0.6, height);
     }
 
@@ -3293,7 +3379,7 @@
     // Update flock movement
     function changeFlockMovement() {
       COLLISION_DISTANCE = COLLISION_DISTANCE === 1.0 ? 2.0 : 1.0;
-      MAXIMUM_VELOCITY = MAXIMUM_VELOCITY === 1 ? 1.5 : 1;
+      MAXIMUM_VELOCITY = MAXIMUM_VELOCITY === 1 ? 1.2 : 1;
     }
 
     // Beat handler.
