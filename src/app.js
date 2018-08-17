@@ -87,15 +87,28 @@ function ready(w, h) {
   const mobile = window.innerWidth < 650 ? true : false;
 
   // Colours.
-  const colourFlock = [0, 0, 0];
-  const colourCat = [0, 0, 0];
   const colourCanvasStop0 = 'white';
   const colourCanvasStop1 = 'white';
   const colourPowerLines = 'black';
+  const colourFlock = [0, 0, 0];
+  const colourCat = [0, 0, 0];
   const colourPupilOuter = 'black';
   const colourPupilInner = 'black';
   const colourLids = '#black';
 
+  // Draw Background.
+  function background() {
+    const canBg = select('canvas#background').node();
+    (canBg.width = w), (canBg.height = h);
+    const ctxBg = canBg.getContext('2d');
+
+    const grd = ctxBg.createLinearGradient(0, 0, 0, canBg.height);
+    grd.addColorStop(0, colourCanvasStop0);
+    grd.addColorStop(1, colourCanvasStop1);
+    ctxBg.fillStyle = grd;
+    // Background colour;
+    ctxBg.fillRect(0, 0, canBg.width, canBg.height);
+  }
 
   // Boids.
   function Boid(x, y, z) {
@@ -343,15 +356,8 @@ function ready(w, h) {
   function draw() {
     let ctx = ctxFlock;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const grd = ctx.createLinearGradient(0, 0, 0, h);
-    grd.addColorStop(0, colourCanvasStop0)
-    grd.addColorStop(1, colourCanvasStop1)
-    ctx.fillStyle = grd;
     ctx.strokeStyle = colourPowerLines;
     ctx.lineWidth = 0.5;
-
-    // Background colour;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.width)
 
     flock.sort(function(a, b) {
       return b.p.z - a.p.z;
@@ -400,6 +406,7 @@ function ready(w, h) {
     const timerBirds = interval(step, 50);
   }
 
+  background();
   initBirds();
 
   /* Draw the cat */

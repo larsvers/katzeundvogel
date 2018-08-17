@@ -2998,13 +2998,27 @@
     var mobile = window.innerWidth < 650 ? true : false;
 
     // Colours.
-    var colourFlock = [0, 0, 0];
-    var colourCat = [0, 0, 0];
     var colourCanvasStop0 = 'white';
     var colourCanvasStop1 = 'white';
     var colourPowerLines = 'black';
+    var colourFlock = [0, 0, 0];
+    var colourCat = [0, 0, 0];
     var colourPupilOuter = 'black';
     var colourLids = '#black';
+
+    // Draw Background.
+    function background() {
+      var canBg = select('canvas#background').node();
+      canBg.width = w, canBg.height = h;
+      var ctxBg = canBg.getContext('2d');
+
+      var grd = ctxBg.createLinearGradient(0, 0, 0, canBg.height);
+      grd.addColorStop(0, colourCanvasStop0);
+      grd.addColorStop(1, colourCanvasStop1);
+      ctxBg.fillStyle = grd;
+      // Background colour;
+      ctxBg.fillRect(0, 0, canBg.width, canBg.height);
+    }
 
     // Boids.
     function Boid(x, y, z) {
@@ -3223,15 +3237,8 @@
     function draw() {
       var ctx = ctxFlock;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      var grd = ctx.createLinearGradient(0, 0, 0, h);
-      grd.addColorStop(0, colourCanvasStop0);
-      grd.addColorStop(1, colourCanvasStop1);
-      ctx.fillStyle = grd;
       ctx.strokeStyle = colourPowerLines;
       ctx.lineWidth = 0.5;
-
-      // Background colour;
-      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.width);
 
       flock.sort(function (a, b) {
         return b.p.z - a.p.z;
@@ -3263,6 +3270,7 @@
       }var timerBirds = interval$1(step, 50);
     }
 
+    background();
     initBirds();
 
     /* Draw the cat */
