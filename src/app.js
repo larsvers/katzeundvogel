@@ -87,15 +87,28 @@ function ready(w, h) {
   const mobile = window.innerWidth < 650 ? true : false;
 
   // Colours.
-  const colourFlock = [240, 248, 255]; // rgb string.
-  const colourCat = [9,14,34]; // rgb string.
-  const colourCanvasStop0 = '#0E1736';
-  const colourCanvasStop1 = '#1e3173';
-  const colourPowerLines = 'aliceblue';
-  const colourPupilOuter = 'black';
-  const colourPupilInner = 'white';
-  const colourLids = '#090e22';
+  const colourCanvasStop0 = '#DB5241';
+  const colourCanvasStop1 = '#F4D663';
+  const colourPowerLines = 'white';
+  const colourFlock = [255, 255, 255]; // rgb string.
+  const colourCat = [37, 0, 0]; // rgb string.
+  const colourPupilOuter = '#250000';
+  const colourPupilInner = '#F4D663';
+  const colourLids = '#250000';
 
+  // Draw Background.
+  function background() {
+    const canBg = select('canvas#background').node();
+    (canBg.width = w), (canBg.height = h);
+    const ctxBg = canBg.getContext('2d');
+
+    const grd = ctxBg.createLinearGradient(0, 0, 0, canBg.height*2);
+    grd.addColorStop(0, colourCanvasStop0);
+    grd.addColorStop(1, colourCanvasStop1);
+    ctxBg.fillStyle = grd;
+    // Background colour;
+    ctxBg.fillRect(0, 0, canBg.width, canBg.height);
+  }
 
   // Boids.
   function Boid(x, y, z) {
@@ -342,16 +355,10 @@ function ready(w, h) {
   // Draw.
   function draw() {
     let ctx = ctxFlock;
+    // debugger
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const grd = ctx.createLinearGradient(0, 0, 0, h);
-    grd.addColorStop(0, colourCanvasStop0)
-    grd.addColorStop(1, colourCanvasStop1)
-    ctx.fillStyle = grd;
     ctx.strokeStyle = colourPowerLines;
     ctx.lineWidth = 0.5;
-
-    // Background colour;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.width)
 
     flock.sort(function(a, b) {
       return b.p.z - a.p.z;
@@ -400,6 +407,7 @@ function ready(w, h) {
     const timerBirds = interval(step, 50);
   }
 
+  background();
   initBirds();
 
   /* Draw the cat */
@@ -458,10 +466,10 @@ function ready(w, h) {
 
     // Draw.
     ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
-    drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
-    drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
-    drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
-    drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
+    drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
+    drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
+    // drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
+    // drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
   }
 
   // Run the pupils.
@@ -479,7 +487,6 @@ function ready(w, h) {
   // ctxLids.fillStyle = 'coral';
   // ctxLids.fillRect(0, 0, w, h);
   // ctxLids.restore()
-
 
   function drawLids(height) {
     ctxLids.clearRect(0, 0, canLids.width, canLids.height);

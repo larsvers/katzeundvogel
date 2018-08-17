@@ -2998,14 +2998,27 @@
     var mobile = window.innerWidth < 650 ? true : false;
 
     // Colours.
-    var colourFlock = [240, 248, 255]; // rgb string.
-    var colourCat = [9, 14, 34]; // rgb string.
-    var colourCanvasStop0 = '#0E1736';
-    var colourCanvasStop1 = '#1e3173';
-    var colourPowerLines = 'aliceblue';
-    var colourPupilOuter = 'black';
-    var colourPupilInner = 'white';
-    var colourLids = '#090e22';
+    var colourCanvasStop0 = '#DB5241';
+    var colourCanvasStop1 = '#F4D663';
+    var colourPowerLines = 'white';
+    var colourFlock = [255, 255, 255]; // rgb string.
+    var colourCat = [37, 0, 0]; // rgb string.
+    var colourPupilOuter = '#250000';
+    var colourLids = '#250000';
+
+    // Draw Background.
+    function background() {
+      var canBg = select('canvas#background').node();
+      canBg.width = w, canBg.height = h;
+      var ctxBg = canBg.getContext('2d');
+
+      var grd = ctxBg.createLinearGradient(0, 0, 0, canBg.height * 2);
+      grd.addColorStop(0, colourCanvasStop0);
+      grd.addColorStop(1, colourCanvasStop1);
+      ctxBg.fillStyle = grd;
+      // Background colour;
+      ctxBg.fillRect(0, 0, canBg.width, canBg.height);
+    }
 
     // Boids.
     function Boid(x, y, z) {
@@ -3223,16 +3236,10 @@
     // Draw.
     function draw() {
       var ctx = ctxFlock;
+      // debugger
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      var grd = ctx.createLinearGradient(0, 0, 0, h);
-      grd.addColorStop(0, colourCanvasStop0);
-      grd.addColorStop(1, colourCanvasStop1);
-      ctx.fillStyle = grd;
       ctx.strokeStyle = colourPowerLines;
       ctx.lineWidth = 0.5;
-
-      // Background colour;
-      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.width);
 
       flock.sort(function (a, b) {
         return b.p.z - a.p.z;
@@ -3264,6 +3271,7 @@
       }var timerBirds = interval$1(step, 50);
     }
 
+    background();
     initBirds();
 
     /* Draw the cat */
@@ -3320,10 +3328,10 @@
 
       // Draw.
       ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
-      drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
-      drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
-      drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
-      drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
+      drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
+      // drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
+      // drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
     }
 
     // Run the pupils.
@@ -3341,7 +3349,6 @@
     // ctxLids.fillStyle = 'coral';
     // ctxLids.fillRect(0, 0, w, h);
     // ctxLids.restore()
-
 
     function drawLids(height) {
       ctxLids.clearRect(0, 0, canLids.width, canLids.height);
