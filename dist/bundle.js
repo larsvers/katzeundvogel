@@ -2834,6 +2834,8 @@
     }
 
     loop();
+
+    return audioContext;
   }
 
   /**
@@ -2948,7 +2950,7 @@
 
     var dispatcher = dispatch('beat');
 
-    beatDetect(audio, dispatcher);
+    var audioContext = beatDetect(audio, dispatcher);
 
     select(audio).on('canplay', function () {
       return select('#canplay').html('canplay');
@@ -3403,8 +3405,11 @@
     /* Move elements into position */
     /* --------------------------- */
 
-    // POsition mute|ummute button and handler
+    // Position mute|ummute button and handler
     select('#mute').style('width', catDims.width + 'px').style('height', catDims.height + 'px').on('mousedown', function () {
+
+      select('#audio-state').html(audioContext.state);
+
       // Mute|unmute.
       var a = select('audio').node();
       a.muted = !a.muted;

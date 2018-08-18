@@ -59,4 +59,7 @@ export function beatDetect(audioElement, dispatcher) {
   }
 
   loop();
+
+  return audioContext;
+
 }

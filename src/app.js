@@ -32,7 +32,7 @@ function ready(w, h) {
 
   const dispatcher = dispatch('beat');
 
-  beatDetect(audio, dispatcher);
+  const audioContext = beatDetect(audio, dispatcher);
 
   select(audio).on('canplay', () => select('#canplay').html('canplay'))
 
@@ -542,11 +542,14 @@ function ready(w, h) {
   /* Move elements into position */
   /* --------------------------- */
 
-  // POsition mute|ummute button and handler
+  // Position mute|ummute button and handler
   select('#mute')
     .style('width', `${catDims.width}px`)
     .style('height', `${catDims.height}px`)
     .on('mousedown', () => {
+
+      select('#audio-state').html(audioContext.state);
+
       // Mute|unmute.
       const a = select('audio').node();
       a.muted = !a.muted;
