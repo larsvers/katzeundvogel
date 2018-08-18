@@ -34,6 +34,8 @@ function ready(w, h) {
 
   beatDetect(audio, dispatcher);
 
+  select(audio).on('canplay', () => select('#canplay').html('canplay'))
+
   /* The birds */
   /* --------- */
 
@@ -87,14 +89,14 @@ function ready(w, h) {
   const mobile = window.innerWidth < 650 ? true : false;
 
   // Colours.
-  const colourCanvasStop0 = '#DB5241';
-  const colourCanvasStop1 = '#F4D663';
-  const colourPowerLines = 'white';
-  const colourFlock = [255, 255, 255]; // rgb string.
-  const colourCat = [37, 0, 0]; // rgb string.
-  const colourPupilOuter = '#250000';
-  const colourPupilInner = '#F4D663';
-  const colourLids = '#250000';
+  const colourCanvasStop0 = 'white';
+  const colourCanvasStop1 = 'white';
+  const colourPowerLines = 'black';
+  const colourFlock = [0, 0, 0];
+  const colourCat = [0, 0, 0];
+  const colourPupilOuter = 'black';
+  const colourPupilInner = 'black';
+  const colourLids = '#black';
 
   // Draw Background.
   function background() {
@@ -102,7 +104,7 @@ function ready(w, h) {
     (canBg.width = w), (canBg.height = h);
     const ctxBg = canBg.getContext('2d');
 
-    const grd = ctxBg.createLinearGradient(0, 0, 0, canBg.height*2);
+    const grd = ctxBg.createLinearGradient(0, 0, 0, canBg.height);
     grd.addColorStop(0, colourCanvasStop0);
     grd.addColorStop(1, colourCanvasStop1);
     ctxBg.fillStyle = grd;
@@ -468,8 +470,6 @@ function ready(w, h) {
     ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
     drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
     drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
-    // drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
-    // drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
   }
 
   // Run the pupils.
