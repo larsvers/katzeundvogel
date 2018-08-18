@@ -2776,6 +2776,8 @@
     ctx.stroke();
   }
 
+  // Uint8Array polyfill for iOS Safari.
+  // https://stackoverflow.com/questions/39129200/javascript-arraybuffer-slice-apparently-broken-in-safari-9-1-2
   if (!Uint8Array.prototype.slice) {
     Uint8Array.prototype.slice = function (a, b) {
       var Uint8ArraySlice = new Uint8Array(this.buffer.slice(a, b));
