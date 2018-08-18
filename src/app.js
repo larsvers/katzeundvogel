@@ -34,6 +34,8 @@ function ready(w, h) {
 
   beatDetect(audio, dispatcher);
 
+  select(audio).on('canplay', () => select('#canplay').html('canplay'))
+
   /* The birds */
   /* --------- */
 

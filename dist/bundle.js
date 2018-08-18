@@ -2950,6 +2950,10 @@
 
     beatDetect(audio, dispatcher);
 
+    select(audio).on('canplay', function () {
+      return select('#canplay').html('canplay');
+    });
+
     /* The birds */
     /* --------- */
 
