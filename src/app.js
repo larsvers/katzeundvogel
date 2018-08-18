@@ -34,7 +34,7 @@ function ready(w, h) {
 
   const audioContext = beatDetect(audio, dispatcher);
 
-  select(audio).on('canplay', () => select('#canplay').html('canplay'))
+  // select(audio).on('canplay', () => select('#canplay').html('canplay'))
 
   /* The birds */
   /* --------- */
@@ -548,15 +548,17 @@ function ready(w, h) {
     .style('height', `${catDims.height}px`)
     .on('mousedown', () => {
 
-      select('#audio-state').html(audioContext.state);
+      // select('#audio-state').html(audioContext.state);
+
+      // debugger
 
       // Mute|unmute.
       const a = select('audio').node();
-      a.muted = !a.muted;
+      a.paused ? a.play() : a.pause();
       // Show|hide text.
       select('#mute-text')
         .transition()
-        .style('opacity', a.muted ? 1 : 0);
+        .style('opacity', a.paused ? 1 : 0);
     });
 
   // Add Mute|unmute text
