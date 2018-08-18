@@ -2776,6 +2776,13 @@
     ctx.stroke();
   }
 
+  if (!Uint8Array.prototype.slice) {
+    Uint8Array.prototype.slice = function (a, b) {
+      var Uint8ArraySlice = new Uint8Array(this.buffer.slice(a, b));
+      return Uint8ArraySlice;
+    };
+  }
+
   function beatDetect(audioElement, dispatcher) {
     // AudioContext, Analyser and Audio.
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -2798,6 +2805,7 @@
     var firstBeat = true;
 
     function declareEvent(data) {
+      // debugger
       // Get max of the low frequencies.
       var maxAmplitude = Math.round(max(data.slice(1, 6)));
 
@@ -2952,8 +2960,6 @@
 
     var audioContext = beatDetect(audio, dispatcher);
 
-    // select(audio).on('canplay', () => select('#canplay').html('canplay'))
-
     /* The birds */
     /* --------- */
 
@@ -2996,6 +3002,9 @@
     // To be changed on beats.
     var COLLISION_DISTANCE = 1.0; // good
     var MAXIMUM_VELOCITY = 1; // good
+
+    // General.
+    var canPlay = false;
     var flock = [];
     var lines = [];
     var flockBounds = { x: w * 0.26, y: w * 0.34 };
@@ -3403,22 +3412,24 @@
     /* Move elements into position */
     /* --------------------------- */
 
-    // Position mute|ummute button and handler
-    select('#mute').style('width', catDims.width + 'px').style('height', catDims.height + 'px').on('mousedown', function () {
-
-      // select('#audio-state').html(audioContext.state);
-
-      // debugger
-
-      // Mute|unmute.
+    // Position mute|ummute button
+    // and add handler.
+    select('#mute').style('width', catDims.width + 'px').style('height', catDims.height + 'px').style('top', h - catDims.height + 'px').on('mousedown', function () {
+      // Play|Pause.
       var a = select('audio').node();
-      a.paused ? a.play() : a.pause();
-      // Show|hide text.
+      a.paused && canPlay ? a.play() : a.pause();
+      // Show|Hide text.
       select('#mute-text').transition().style('opacity', a.paused ? 1 : 0);
     });
 
-    // Add Mute|unmute text
-    select('#mute-text').style('left', catDims.width * 1.1 + 'px');
+    // Add play|pause text.
+    select('#mute-text').style('top', h - catDims.height / 2 + 'px').style('left', catDims.width * 1.1 + 'px');
+
+    // Show text and allow play when audio can play.
+    select(audio).on('canplay', function () {
+      canPlay = true;
+      select('#mute-text').transition().duration(2000).style('opacity', 1);
+    });
 
     // Position mail text.
     // Get y position of lowest line

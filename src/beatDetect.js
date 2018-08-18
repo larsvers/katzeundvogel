@@ -1,5 +1,12 @@
 import { max } from 'd3-array';
 
+if(!Uint8Array.prototype.slice) {
+  Uint8Array.prototype.slice = function(a,b){
+    var Uint8ArraySlice = new Uint8Array(this.buffer.slice(a,b));
+    return Uint8ArraySlice;
+  }
+}
+
 export function beatDetect(audioElement, dispatcher) {
   // AudioContext, Analyser and Audio.
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -23,6 +30,7 @@ export function beatDetect(audioElement, dispatcher) {
   let firstBeat = true;
 
   function declareEvent(data) {
+    // debugger
     // Get max of the low frequencies.
     const maxAmplitude = Math.round(max(data.slice(1, 6)));
 

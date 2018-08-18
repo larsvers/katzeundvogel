@@ -34,8 +34,6 @@ function ready(w, h) {
 
   const audioContext = beatDetect(audio, dispatcher);
 
-  // select(audio).on('canplay', () => select('#canplay').html('canplay'))
-
   /* The birds */
   /* --------- */
 
@@ -82,6 +80,7 @@ function ready(w, h) {
   let MAXIMUM_VELOCITY = 1; // good
 
   // General.
+  let canPlay = false;
   let timerBirds;
   let flock = [];
   let lines = [];
@@ -542,27 +541,35 @@ function ready(w, h) {
   /* Move elements into position */
   /* --------------------------- */
 
-  // Position mute|ummute button and handler
+  // Position mute|ummute button
+  // and add handler.
   select('#mute')
     .style('width', `${catDims.width}px`)
     .style('height', `${catDims.height}px`)
+    .style('top', `${h - catDims.height}px`)
     .on('mousedown', () => {
-
-      // select('#audio-state').html(audioContext.state);
-
-      // debugger
-
-      // Mute|unmute.
+      // Play|Pause.
       const a = select('audio').node();
-      a.paused ? a.play() : a.pause();
-      // Show|hide text.
+      a.paused && canPlay ? a.play() : a.pause();
+      // Show|Hide text.
       select('#mute-text')
         .transition()
         .style('opacity', a.paused ? 1 : 0);
     });
 
-  // Add Mute|unmute text
-  select('#mute-text').style('left', `${catDims.width * 1.1}px`);
+  // Add play|pause text.
+  select('#mute-text')
+    .style('top', `${h - catDims.height / 2}px`)
+    .style('left', `${catDims.width * 1.1}px`);
+
+  // Show text and allow play when audio can play.
+  select(audio).on('canplay', () => {
+    canPlay = true;
+    select('#mute-text')
+      .transition()
+      .duration(2000)
+      .style('opacity', 1);
+  });
 
   // Position mail text.
   // Get y position of lowest line
