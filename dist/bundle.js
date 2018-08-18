@@ -3013,13 +3013,13 @@
     var mobile = window.innerWidth < 650 ? true : false;
 
     // Colours.
-    var colourCanvasStop0 = 'white';
-    var colourCanvasStop1 = 'white';
-    var colourPowerLines = 'black';
-    var colourFlock = [0, 0, 0];
-    var colourCat = [0, 0, 0];
-    var colourPupilOuter = 'black';
-    var colourLids = '#black';
+    var colourCanvasStop0 = '#DB5241';
+    var colourCanvasStop1 = '#F4D663';
+    var colourPowerLines = 'white';
+    var colourFlock = [255, 255, 255];
+    var colourCat = [37, 0, 0];
+    var colourPupilOuter = '#250000';
+    var colourLids = '#250000';
 
     // Draw Background.
     function background() {

@@ -88,14 +88,14 @@ function ready(w, h) {
   const mobile = window.innerWidth < 650 ? true : false;
 
   // Colours.
-  const colourCanvasStop0 = 'white';
-  const colourCanvasStop1 = 'white';
-  const colourPowerLines = 'black';
-  const colourFlock = [0, 0, 0];
-  const colourCat = [0, 0, 0];
-  const colourPupilOuter = 'black';
-  const colourPupilInner = 'black';
-  const colourLids = '#black';
+  const colourCanvasStop0 = '#DB5241';
+  const colourCanvasStop1 = '#F4D663';
+  const colourPowerLines = 'white';
+  const colourFlock = [255, 255, 255];
+  const colourCat = [37, 0, 0];
+  const colourPupilOuter = '#250000';
+  const colourPupilInner = '#F4D663';
+  const colourLids = '#250000';
 
   // Draw Background.
   function background() {
