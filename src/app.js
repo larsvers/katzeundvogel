@@ -96,16 +96,62 @@ function ready(w, h) {
   let lines = [];
   const flockBounds = { x: w * 0.26, y: w * 0.34 };
   const mobile = window.innerWidth < 650 ? true : false;
+  const now = new Date();
+  const day = now.getHours() > 5 && now.getHours() < 18;
 
-  // Colours.
-  const colourCanvasStop0 = 'white';
-  const colourCanvasStop1 = 'white';
-  const colourPowerLines = 'black';
-  const colourFlock = [0, 0, 0];
-  const colourCat = [0, 0, 0];
-  const colourPupilOuter = 'black';
-  const colourPupilInner = 'black';
-  const colourLids = '#black';
+
+  // Colours definition.
+  let colourFont;
+  let colourLink;
+  let colourCanvasStop0;
+  let colourCanvasStop1;
+  let colourPowerLines;
+  let colourFlock;
+  let colourCat;
+  let colourPupilOuter;
+  let colourPupilInner;
+  let colourLids;
+
+  // Set day|night colours.
+  if (day) {
+    colourFont = 'black';
+    colourLink = 'hotpink';
+    colourCanvasStop0 = 'white';
+    colourCanvasStop1 = 'white';
+    colourPowerLines = 'black';
+    colourFlock = [0, 0, 0];
+    colourCat = [0, 0, 0];
+    colourPupilOuter = 'black';
+    colourPupilInner = 'black';
+    colourLids = '#black';
+  } else {
+    colourFont = 'white';
+    colourLink = 'deeppink';
+    colourCanvasStop0 = '#0E1736';
+    colourCanvasStop1 = '#1e3173';
+    colourPowerLines = 'aliceblue';
+    colourFlock = [240, 248, 255]; // rgb string.
+    colourCat = [9,14,34]; // rgb string.
+    colourPupilOuter = 'black';
+    colourPupilInner = 'white';
+    colourLids = '#090e22';
+  }
+
+  // Colour HTML elements.
+  // Canvas elements will be styled in js code below.
+  select('body').style('color', colourFont);
+  select('#mail a')
+    .style('color', colourFont)
+    .on('mouseover', function(){
+      select(this).transition().style('color', colourLink)
+    })
+    .on('mouseout', function() {
+      select(this).transition().style('color', colourFont)
+    });
+
+
+
+
 
   // Draw Background.
   function background() {
@@ -477,8 +523,16 @@ function ready(w, h) {
 
     // Draw.
     ctxPupils.clearRect(0, 0, ctxPupils.canvas.width, ctxPupils.canvas.height);
-    drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
-    drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
+
+    if (day) {    
+      drawPupil(ctxPupils, leftPupil, flockPosition, 2, colourPupilOuter);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 2, colourPupilOuter);
+    } else {    
+      drawPupil(ctxPupils, leftPupil, flockPosition, 3, colourPupilOuter);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 3, colourPupilOuter);
+      drawPupil(ctxPupils, leftPupil, flockPosition, 1, colourPupilInner);
+      drawPupil(ctxPupils, rightPupil, flockPosition, 1, colourPupilInner);
+    }
   }
 
   // Run the pupils.
