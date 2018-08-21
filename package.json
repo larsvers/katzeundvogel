@@ -18,11 +18,12 @@
     "uglify-js": "^3"
   },
   "dependencies": {
-    "d3": "^5.6.0",
-    "d3-geo-projection": "^1",
-    "d3-scale-chromatic": "^1",
-    "debounce": "^1.2.0",
-    "topojson": "^3"
+    "d3-array": "^1",
+    "d3-dispatch": "^1",
+    "d3-selection": "^1",
+    "d3-timer": "^1",
+    "d3-transition": "^1",
+    "debounce": "^1.2.0"
   },
   "scripts": {
     "build": "rollup -c",
