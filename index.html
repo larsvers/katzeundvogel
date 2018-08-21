@@ -83,23 +83,27 @@
   <img src="./images/cat.png" id="cat-image">
 
   <div id="container">
-    <audio id="music" loop>
+
+    <audio loop>
       <source src="music/einmusik.mp3" type="audio/mpeg">
-        Oh no!! The audio API is not supported. Just look at the birds instead...
+      <source src="music/einmusik.ogg" type="audio/ogg">
+        No Audio
     </audio>
+
     <canvas id="background"></canvas>
     <canvas id="flock"></canvas>
     <canvas id="cat"></canvas>
     <canvas id="pupils"></canvas>
     <canvas id="lids"></canvas>
+
     <button id="mute"></button>
-    <div id="mute-text">← Hit Katze to hear...</div>
-    <div id="mail"><a href="mailto:piep@katzeundvogel.club?Subject=Miau" target="_top">piep@katzeundvogel.club</a></div>
+    <div id="mute-text">← Hit Katze hear...</div>
 
-    <div id="canplay"></div>
+    <div id="mail"><a href="mailto:piep@katzeundvogel.de?Subject=Miau" target="_top">piep@katzeundvogel.de</a></div>
+
     <div id="audio-state"></div>
-  </div>
 
+  </div>
 
   <script src="dist/bundle.js"></script>
 

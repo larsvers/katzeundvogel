@@ -1,3 +1,4 @@
+import './polyfill_findIndex.js';
 import { select } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { dispatch } from 'd3-dispatch';
@@ -18,7 +19,8 @@ import {
   near,
   yz,
   circle,
-  line
+  line,
+  isMobileDevice
 } from './utils.js';
 import { beatDetect } from './beatDetect.js';
 import { drawPupil } from './drawPupil.js';
@@ -28,11 +30,20 @@ function ready(w, h) {
   /* The sound */
   /* --------- */
 
-  const audio = document.querySelector('#music');
+  const audio = document.querySelector('audio');
 
   const dispatcher = dispatch('beat');
 
-  const audioContext = beatDetect(audio, dispatcher);
+  // Check audio skills.
+  const isMobile = isMobileDevice();
+  const supportsAudio =
+    window.AudioContext || window.webkitAudioContext ? true : false;
+
+  // On iOS at least piping the audio through the analyser disables the actual
+  // play. Not digged into it - sinful but other things are pressing.
+  if (!isMobile && supportsAudio) {
+    const audioContext = beatDetect(audio, dispatcher);
+  }
 
   /* The birds */
   /* --------- */
@@ -80,7 +91,6 @@ function ready(w, h) {
   let MAXIMUM_VELOCITY = 1; // good
 
   // General.
-  let canPlay = false;
   let timerBirds;
   let flock = [];
   let lines = [];
@@ -482,11 +492,6 @@ function ready(w, h) {
   (canLids.width = w), (canLids.height = h);
   const ctxLids = canLids.getContext('2d');
 
-  // ctxLids.save();
-  // ctxLids.fillStyle = 'coral';
-  // ctxLids.fillRect(0, 0, w, h);
-  // ctxLids.restore()
-
   function drawLids(height) {
     ctxLids.clearRect(0, 0, canLids.width, canLids.height);
     ctxLids.fillStyle = colourLids;
@@ -540,6 +545,8 @@ function ready(w, h) {
 
   /* Move elements into position */
   /* --------------------------- */
+  // Play|Pause.
+  // const audio = select('audio').node();
 
   // Position mute|ummute button
   // and add handler.
@@ -548,13 +555,12 @@ function ready(w, h) {
     .style('height', `${catDims.height}px`)
     .style('top', `${h - catDims.height}px`)
     .on('mousedown', () => {
-      // Play|Pause.
-      const a = select('audio').node();
-      a.paused && canPlay ? a.play() : a.pause();
+      // Play|pause audio.
+      audio.paused ? audio.play() : audio.pause();
       // Show|Hide text.
       select('#mute-text')
         .transition()
-        .style('opacity', a.paused ? 1 : 0);
+        .style('opacity', audio.paused ? 1 : 0);
     });
 
   // Add play|pause text.
@@ -563,13 +569,12 @@ function ready(w, h) {
     .style('left', `${catDims.width * 1.1}px`);
 
   // Show text and allow play when audio can play.
-  select(audio).on('canplay', () => {
-    canPlay = true;
-    select('#mute-text')
-      .transition()
-      .duration(2000)
-      .style('opacity', 1);
-  });
+  // Removed `canplay` conditional here as there
+  // was trouble with iOS.
+  select('#mute-text')
+    .transition()
+    .duration(2000)
+    .style('opacity', 1);
 
   // Position mail text.
   // Get y position of lowest line
@@ -594,5 +599,6 @@ function resize() {
   ready(w, h);
 }
 
+// Resize would require more thought.
 // window.addEventListener('resize', debounce(resize, 150));
 resize();

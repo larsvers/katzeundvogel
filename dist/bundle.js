@@ -1,6 +1,55 @@
 (function () {
   'use strict';
 
+  // https://tc39.github.io/ecma262/#sec-array.prototype.findIndex
+  (function () {
+    if (!Array.prototype.findIndex) {
+      Object.defineProperty(Array.prototype, 'findIndex', {
+        value: function value(predicate) {
+          // 1. Let O be ? ToObject(this value).
+          if (this == null) {
+            throw new TypeError('"this" is null or not defined');
+          }
+
+          var o = Object(this);
+
+          // 2. Let len be ? ToLength(? Get(O, "length")).
+          var len = o.length >>> 0;
+
+          // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+          if (typeof predicate !== 'function') {
+            throw new TypeError('predicate must be a function');
+          }
+
+          // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+          var thisArg = arguments[1];
+
+          // 5. Let k be 0.
+          var k = 0;
+
+          // 6. Repeat, while k < len
+          while (k < len) {
+            // a. Let Pk be ! ToString(k).
+            // b. Let kValue be ? Get(O, Pk).
+            // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+            // d. If testResult is true, return k.
+            var kValue = o[k];
+            if (predicate.call(thisArg, kValue, k, o)) {
+              return k;
+            }
+            // e. Increase k by 1.
+            k++;
+          }
+
+          // 7. Return -1.
+          return -1;
+        },
+        configurable: true,
+        writable: true
+      });
+    }
+  })();
+
   var xhtml = "http://www.w3.org/1999/xhtml";
 
   var namespaces = {
@@ -2776,6 +2825,15 @@
     ctx.stroke();
   }
 
+  /**
+   * Relatively save way to check for mobile.
+   * https://coderwall.com/p/i817wa/one-line-function-to-detect-mobile-devices-with-javascript
+   * @return {Boolean}  `true` if mobile.
+   */
+  function isMobileDevice() {
+    return typeof window.orientation !== 'undefined' || navigator.userAgent.indexOf('IEMobile') !== -1;
+  }
+
   // Uint8Array polyfill for iOS Safari.
   // https://stackoverflow.com/questions/39129200/javascript-arraybuffer-slice-apparently-broken-in-safari-9-1-2
   if (!Uint8Array.prototype.slice) {
@@ -2807,7 +2865,6 @@
     var firstBeat = true;
 
     function declareEvent(data) {
-      // debugger
       // Get max of the low frequencies.
       var maxAmplitude = Math.round(max(data.slice(1, 6)));
 
@@ -2956,11 +3013,19 @@
     /* The sound */
     /* --------- */
 
-    var audio = document.querySelector('#music');
+    var audio = document.querySelector('audio');
 
     var dispatcher = dispatch('beat');
 
-    var audioContext = beatDetect(audio, dispatcher);
+    // Check audio skills.
+    var isMobile = isMobileDevice();
+    var supportsAudio = window.AudioContext || window.webkitAudioContext ? true : false;
+
+    // On iOS at least piping the audio through the analyser disables the actual
+    // play. Not digged into it - sinful but other things are pressing.
+    if (!isMobile && supportsAudio) {
+      var audioContext = beatDetect(audio, dispatcher);
+    }
 
     /* The birds */
     /* --------- */
@@ -3004,9 +3069,6 @@
     // To be changed on beats.
     var COLLISION_DISTANCE = 1.0; // good
     var MAXIMUM_VELOCITY = 1; // good
-
-    // General.
-    var canPlay = false;
     var flock = [];
     var lines = [];
     var flockBounds = { x: w * 0.26, y: w * 0.34 };
@@ -3358,11 +3420,6 @@
     canLids.width = w, canLids.height = h;
     var ctxLids = canLids.getContext('2d');
 
-    // ctxLids.save();
-    // ctxLids.fillStyle = 'coral';
-    // ctxLids.fillRect(0, 0, w, h);
-    // ctxLids.restore()
-
     function drawLids(height) {
       ctxLids.clearRect(0, 0, canLids.width, canLids.height);
       ctxLids.fillStyle = colourLids;
@@ -3413,25 +3470,25 @@
 
     /* Move elements into position */
     /* --------------------------- */
+    // Play|Pause.
+    // const audio = select('audio').node();
 
     // Position mute|ummute button
     // and add handler.
     select('#mute').style('width', catDims.width + 'px').style('height', catDims.height + 'px').style('top', h - catDims.height + 'px').on('mousedown', function () {
-      // Play|Pause.
-      var a = select('audio').node();
-      a.paused && canPlay ? a.play() : a.pause();
+      // Play|pause audio.
+      audio.paused ? audio.play() : audio.pause();
       // Show|Hide text.
-      select('#mute-text').transition().style('opacity', a.paused ? 1 : 0);
+      select('#mute-text').transition().style('opacity', audio.paused ? 1 : 0);
     });
 
     // Add play|pause text.
     select('#mute-text').style('top', h - catDims.height / 2 + 'px').style('left', catDims.width * 1.1 + 'px');
 
     // Show text and allow play when audio can play.
-    select(audio).on('canplay', function () {
-      canPlay = true;
-      select('#mute-text').transition().duration(2000).style('opacity', 1);
-    });
+    // Removed `canplay` conditional here as there
+    // was trouble with iOS.
+    select('#mute-text').transition().duration(2000).style('opacity', 1);
 
     // Position mail text.
     // Get y position of lowest line
@@ -3454,6 +3511,7 @@
     ready(w, h);
   }
 
+  // Resize would require more thought.
   // window.addEventListener('resize', debounce(resize, 150));
   resize();
 

@@ -59,3 +59,15 @@ export function line(ctx, x1, y1, x2, y2) {
   ctx.closePath();
   ctx.stroke();
 }
+
+/**
+ * Relatively save way to check for mobile.
+ * https://coderwall.com/p/i817wa/one-line-function-to-detect-mobile-devices-with-javascript
+ * @return {Boolean}  `true` if mobile.
+ */
+export function isMobileDevice() {
+  return (
+    typeof window.orientation !== 'undefined' ||
+    navigator.userAgent.indexOf('IEMobile') !== -1
+  );
+}

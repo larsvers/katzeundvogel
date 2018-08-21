@@ -32,7 +32,6 @@ export function beatDetect(audioElement, dispatcher) {
   let firstBeat = true;
 
   function declareEvent(data) {
-    // debugger
     // Get max of the low frequencies.
     const maxAmplitude = Math.round(max(data.slice(1, 6)));
 
